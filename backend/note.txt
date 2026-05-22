@@ -1,0 +1,53 @@
+=================================================================================================
+npm installs
+
+    - express          --> Framework xây dựng api
+    - cors             --> Cho phép / hạn chế các ứng dụng khác (giữa các port với nhau)
+    - mongoose         --> Kết nối & Làm việc với cơ sở dữ liệu mongodb
+    - dotenv           --> Truy cập vào các biến môi trường trong .env
+    - nodemon          --> Tự động khởi động lại nodejs mỗi khi code thay đổi (ở môi trường development)
+    - jsonwebtoken     --> Dùng cho chức năng đăng nhập / phân quyền người dùng
+    - bcrypt           --> Mã hóa mật khẩu
+    - cookie-parser    --> Đọc dữ liệu cookie từ request
+
+=================================================================================================
+Flow của Authentications:
+
+Sign up: 
+    - Lấy signup data từ request
+    - Kiểm tra username tồn tại chưa
+    - Nếu chưa:
+        + Mã hóa password
+        + Tạo user mới trong db
+        + return 204 (No content)
+
+Sign in: 
+    - Lấy signin data từ request (username + password)
+    - Lấy thông tin user từ data --> lấy password để so sánh
+    - Nếu password khớp: 
+        + Tạo accessToken bằng JWT
+        + Tạo refresh token
+        + Tạo session mới trong db để lưu refresh token
+        + Trả refresh token về trong cookie
+        + return 200 có kèm accessToken
+
+Sign out:
+    - Lấy refresh token từ cookie
+    - Nếu tồn tại token:
+        + Xóa refresh token đó trong db (bảng session)
+        + Xóa cookie
+
+=================================================================================================
+Flow của Authorization:
+
+- Lấy token từ header
+- Xác nhận token có hợp lệ không
+    + Lấy thông tin user
+    + Trả user về trong request
+    + Chuyển đến hành động tiếp theo (middleware khác / vào api)
+
+=================================================================================================
+middleware (server.js)
+
+- Các private routes được đặt sau app.use(protectedRoute)
+    + Trong protectedRoute --> thực hiện Authorization

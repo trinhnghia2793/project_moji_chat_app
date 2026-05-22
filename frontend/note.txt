@@ -1,0 +1,34 @@
+=================================================================================================
+npm create
+
+    - vite      -->
+
+=================================================================================================
+npm installs
+
+    - react-router             --> Quản lý định tuyến, chuyển đổi giữa các trang trong ứng dụng React
+    - axios                    --> Gửi các request (GET, POST,...) để gọi API từ frontend đến backend
+    - lucide-react             --> Bộ thư viện cung cấp các icon (biểu tượng) dạng vector, dễ tùy biến
+    - tailwindcss              --> Framework CSS dạng utility-first giúp viết giao diện nhanh bằng class
+    - @tailwindcss/vite        --> Plugin tích hợp Tailwind CSS vào công cụ build Vite (giúp tối ưu hiệu năng)
+    - tailwindcss-animate      --> Plugin bổ sung các class làm hiệu ứng chuyển động (animation) cho Tailwind
+    - zustand                  --> Quản lý trạng thái (state) toàn cục cho ứng dụng, nhẹ và dễ dùng hơn Redux
+    - zod                      --> Kiểm tra và xác thực dữ liệu (validation), định nghĩa kiểu dữ liệu an toàn
+    - react-hook-form          --> Quản lý trạng thái và xử lý các form trong React
+    - @hookform/resolvers      --> Cầu nối giúp kết hợp react-hook-form với các thư viện xác thực như Zod
+    - sonner                   --> Tạo các thông báo nhỏ (toast notification) ở góc màn hình
+
+=================================================================================================
+others
+
+npm i -D @types/node     --> Giúp TS hiểu được các kiểu dữ liệu của nodejs
+
+=================================================================================================
+Interceptors trong axios
+
+- Hoạt động như middleware nhưng là ở tầng server:
+    + Thực hiện các hành động trước khi vào api
+- Các Interceptors:
+    + Nếu có accessToken --> gắn accessToken vào request header
+    + Tự động gọi refresh api khi accessToken hết hạn
+
