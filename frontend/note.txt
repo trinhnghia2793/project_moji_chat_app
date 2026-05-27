@@ -1,7 +1,7 @@
 =================================================================================================
 npm create
 
-    - vite      -->
+    - vite      --> Công cụ tạo môi trường frontend
 
 =================================================================================================
 npm installs
@@ -32,3 +32,18 @@ Interceptors trong axios
     + Nếu có accessToken --> gắn accessToken vào request header
     + Tự động gọi refresh api khi accessToken hết hạn
 
+=================================================================================================
+Socket IO
+- Giữ kết nối giữa frontend và backend
+- Cần có 1 instance ở frontend và 1 instance ở backend
+- Từ khóa: 
+    + socket.on = nghe/nhận sự kiện
+    + socket.emit = gửi/phát sự kiện
+- Setup SocketIO (cho frontend) - sau khi setup bên backend
+    + npm i socket.io-client --legacy-peer-deps (tại error nên mới phải thêm cái legacy này)
+    + tạo src/store/useSocketStore.js để quản lý socket riêng & viết các socket.on
+    + tạo các biến môi trường trong .env.production và .env.development
+    + đổi env environment config trong axios.ts
+    + sử dụng socket trong App.tsx
+    + useChatStore: viết các hàm để cập nhật khi add message vào 1 conversation & cập nhật conversation properties khi add message
+    + ChatWindowHeader / DirectMessageCard: viết logic hiển thị trạng thái của online user từ biến toàn cục (zustand) onlineUsers

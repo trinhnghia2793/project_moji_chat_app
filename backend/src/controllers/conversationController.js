@@ -154,3 +154,18 @@ export const getMessages = async (req, res) => {
     });
   }
 }
+
+//==============================================================================================
+// lấy danh sách id của các cuộc hội thoại thuộc về 1 user
+export const getUserConversationsForSocketIO = async (userId) => {
+  try {
+    const conversations = await Conversation.find(
+      { "participants.userId": userId },
+      { _id: 1 }, // chỉ lấy trường id
+    );
+    return conversations.map((c) => c._id.toString());
+  } catch (error) {
+    console.error("Lỗi khi fetch conversations trong socketIO ", error);
+    return [];
+  }
+}

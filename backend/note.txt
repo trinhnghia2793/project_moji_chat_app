@@ -51,3 +51,20 @@ middleware (server.js)
 
 - Các private routes được đặt sau app.use(protectedRoute)
     + Trong protectedRoute --> thực hiện Authorization
+
+=================================================================================================
+Socket IO
+- Giữ kết nối giữa frontend và backend
+- Cần có 1 instance ở frontend và 1 instance ở backend
+- Từ khóa: 
+    + socket.on = nghe/nhận sự kiện
+    + socket.emit = gửi/phát sự kiện
+- Setup SocketIO (cho backend)
+    + npm i socket.io
+    + tạo src/socket/index.js để cấu hình cho socket
+    + chỉnh sửa cấu hình trong server.js
+    + socket/index.js:
+        * tạo socketMiddleware để bảo vệ socket & use middleware 
+        * viết hàm emit sự kiện online/offline
+    + messageController:
+        * viết hàm emit sự kiện new message (controller & helper)

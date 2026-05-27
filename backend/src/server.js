@@ -11,11 +11,12 @@ import cookieParser from "cookie-parser";
 import cors from 'cors';
 import swaggerUI from 'swagger-ui-express';
 import fs from "fs"; // đọc nội dung của tệp json
+import { app, server } from "./socket/index.js";
 
 // load env variables
 dotenv.config();
 
-const app = express();
+// const app = express();
 const PORT = process.env.PORT || 5001;
 
 // middlewares
@@ -39,7 +40,7 @@ app.use('/api/messages', messageRoute);
 app.use('/api/conversations', conversationRoute);
 
 connectDB().then(() => {
-  app.listen(PORT, () => {
+  server.listen(PORT, () => {
     console.log(`Server bắt đầu trên cổng ${PORT}`);
   });
 })
