@@ -1,5 +1,6 @@
 import Conversation from "../models/Conversation.js";
 import Message from "../models/Message.js";
+import { io } from "../socket/index.js"; 
 
 //==============================================================================================
 // tạo cuộc trò chuyện nhắn trực tiếp / nhóm mới
@@ -68,8 +69,23 @@ export const createConversation = async (req, res) => {
       { path: "lastMessage.senderId", select: "displayName avatarUrl" },
     ]);
 
+    const participants = (conversation.participants || []).map((p) => ({
+      _id: p.userId?._id,
+      displayName: p.userId?.displayName,
+      avatarUrl: p.userId?.avatarUrl ?? null,
+      joinedAt: p.joinedAt,
+    })); // đoạn này giống ở trong hàm getConversations (lặp)
+    const formatted = {...conversation.toObject(), participants};
+
+    if (type === "group") {
+      // emit cho mỗi thành viên có trong nhóm
+      memberIds.forEach((userId) => {
+        io.to(userId).emit("new-group", formatted);
+      });
+    }
+
     return res.status(201).json({
-      conversation
+      conversation: formatted,
     });
   } catch (error) {
     console.error("Lỗi khi tạo conversation", error);
@@ -167,5 +183,69 @@ export const getUserConversationsForSocketIO = async (userId) => {
   } catch (error) {
     console.error("Lỗi khi fetch conversations trong socketIO ", error);
     return [];
+  }
+}
+
+//==============================================================================================
+// đánh dấu tin nhắn đã đọc
+export const markAsSeen = async (req, res) => {
+  try {
+    const { conversationId } = req.params;
+    const userId = req.user._id.toString();
+
+    const conversation = await Conversation.findById(conversationId).lean(); // lean: trả về javascript object thay vì mongoose document
+    if (!conversation) {
+      return res.status(404).json({
+        message: "Conversation không tồn tại"
+      });
+    }
+
+    const last = conversation.lastMessage;
+    if (!last) {
+      return res.status.json(200).json({
+        message: "Không có tin nhắn để markAsSeen"
+      });
+    }
+
+    if (last.senderId.toString() === userId) {
+      return res.status(200).json({
+        message: "Sender không cần markAsSeen"
+      });
+    }
+
+    //===============
+    const updated = await Conversation.findByIdAndUpdate(
+      conversationId,
+      {
+        $addToSet: { seenBy: userId }, // thêm không trùng userId vào mảng seenBy
+        $set: { [`unreadCounts.${userId}`]: 0 }, // set số tin chưa đọc của user hiện tại về 0
+      },
+      {
+        new: true // trả về document sau khi update (mặc định không có cái này --> trả về document cũ)
+      }
+    );
+
+    io.to(conversationId).emit("read-message", {
+      conversation: updated,
+      lastMessage: {
+        _id: updated?.lastMessage._id,
+        content: updated?.lastMessage.content,
+        createdAt: updated?.lastMessage.createdAt,
+        sender: {
+          _id: updated?.lastMessage.senderId,
+        }
+      }
+    });
+
+    return res.status(200).json({
+      message: "Marked as seen",
+      seenBy: updated?.seenBy || [],
+      myUnreadCount: updated?.unreadCounts[userId] || 0, // lấy số lượng tin chưa đọc của user hiện tại
+    });
+  } catch (error) {
+    console.error("Lỗi khi markAsSeen", error);
+    return res.status(500).json({
+      message: "Lỗi hệ thống"
+    });
   }
 }

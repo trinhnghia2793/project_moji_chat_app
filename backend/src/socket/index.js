@@ -34,6 +34,14 @@ io.on("connection", async (socket) => {
     socket.join(id);
   });
 
+  // khi user tạo conversation mới --> server sẽ join vào phòng này
+  socket.on("join-conversation", (conversationId) => {
+    socket.join(conversationId);
+  });
+
+  // tạo phòng theo userId (để phát socket emit khi tạo nhóm - sau này có thể thêm logic như thông báo...)
+  socket.join(user._id.toString());
+
   // disconnect
   socket.on("disconnect", () => {
     // xóa người này khỏi danh sách online + thông báo

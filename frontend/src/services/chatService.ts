@@ -55,4 +55,16 @@ export const chatService = {
     });
     return res.data.message;
   },
+
+  // đánh dấu tin nhắn là đã đọc
+  async markAsSeen(conversationId: string) {
+    const res = await api.patch(`/conversations/${conversationId}/seen`);
+    return res.data;
+  },
+
+  // tạo conversation mới
+  async createConversation (type: "direct" | "group", name: string, memberIds: string[]) {
+    const res = await api.post("/conversations", {type, name, memberIds});
+    return res.data.conversation;
+  },
 };

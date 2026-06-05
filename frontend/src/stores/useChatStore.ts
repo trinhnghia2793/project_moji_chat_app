@@ -3,6 +3,7 @@ import type { ChatState } from "@/types/store";
 import { create } from "zustand";
 import { persist } from "zustand/middleware";
 import { useAuthStore } from "./useAuthStore";
+import { useSocketStore } from "./useSocketStore";
 
 export const useChatStore = create<ChatState>()(
   persist(
@@ -12,6 +13,7 @@ export const useChatStore = create<ChatState>()(
       activeConversationId: null,
       converLoading: false, // conversation loading
       messageLoading: false, // message box loading
+      loading: false, // for create new conversation
 
       //
       setActiveConversation: (id) => set({ activeConversationId: id }),
@@ -165,7 +167,73 @@ export const useChatStore = create<ChatState>()(
             c._id === conversation._id ? { ...c, ...conversation } : c
           ),
         }));
-      }
+      },
+      //
+      markAsSeen: async() => {
+        try {
+          const { user } = useAuthStore.getState();
+          const { activeConversationId, conversations } = get();
+
+          if (!activeConversationId || !user) {
+            return;
+          }
+
+          const conver = conversations.find((c) => c._id === activeConversationId);
+          if (!conver) {
+            return;
+          }
+
+          if ((conver.unreadCounts?.[user._id] ?? 0) === 0) {
+            return;
+          }
+
+          //==================
+          await chatService.markAsSeen(activeConversationId);
+
+          set((state) => ({ // cập nhật lại state
+            conversations: state.conversations.map((c) => (
+              c._id === activeConversationId && c.lastMessage 
+                ? {
+                  ...c,
+                  unreadCounts: {
+                    ...c.unreadCounts,
+                    [user._id]: 0
+                  }
+                }
+                : c
+            )),
+          }));
+        } catch (error) {
+          console.error("Lỗi xảy ra khi gọi markAsSeen trong store", error);
+        }
+      },
+      //
+      addConver: (conver) => {
+        set((state) => {
+          const exists = state.conversations.some((c) => c._id.toString() === conver._id.toString());
+          return {
+            conversations: exists
+              ? state.conversations
+              : [conver, ...state.conversations],
+            activeConversationId: conver._id,
+          };
+        });
+      },
+      //
+      createConversation: async (type, name, memberIds) => {
+        try {
+          set({ loading: true });
+          const conversation = await chatService.createConversation(type, name, memberIds);
+          get().addConver(conversation);
+
+          // socket emit
+          useSocketStore.getState().socket?.emit("join-conversation", conversation._id);
+        } catch (error) {
+          console.error("Lỗi xảy ra khi gọi createConversation trong store", error);
+        } finally {
+          set({ loading: false });
+        }
+      },
     }),
     {
       name: "chat-storage",

@@ -1,4 +1,7 @@
 =================================================================================================
+frontend React using Vite deploy on Vercel
+
+=================================================================================================
 npm create
 
     - vite      --> Công cụ tạo môi trường frontend
@@ -17,6 +20,11 @@ npm installs
     - react-hook-form          --> Quản lý trạng thái và xử lý các form trong React
     - @hookform/resolvers      --> Cầu nối giúp kết hợp react-hook-form với các thư viện xác thực như Zod
     - sonner                   --> Tạo các thông báo nhỏ (toast notification) ở góc màn hình
+    - emoji-mart               
+    - emoji-mart/data               
+    - emoji-mart/react         --> Box emoji trong phần nhập tin nhắn
+    - socket.io-client         --> Kết nối giữa FE và BE
+    - react-infinite-scroll-component --> Cuộn tới đâu tải thêm dữ liệu tới đó
 
 =================================================================================================
 others

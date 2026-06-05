@@ -163,8 +163,8 @@ export const getAllFriends = async (req, res) => {
           { userB: userId },
         ]
       })
-      .populate("userA", "_id displayName avatarUrl")
-      .populate("userB", "_id displayName avatarUrl")
+      .populate("userA", "_id username displayName avatarUrl")
+      .populate("userB", "_id username displayName avatarUrl")
       .lean();
 
     // không có mối quan hệ bạn bè --> return 
@@ -176,7 +176,7 @@ export const getAllFriends = async (req, res) => {
 
     // trong danh sách mối quan hệ, userId nằm ở B --> lấy A (ngược lại)
     const friends = friendships.map((f) => 
-      f.userA.toString() === userId.toString()
+      f.userA._id.toString() === userId.toString()
         ? f.userB
         : f.userA
     );
@@ -199,7 +199,7 @@ export const getFriendRequests = async (req, res) => {
   try {
     const userId = req.user._id;
 
-    const populateFields = "_id username displayname avatarUrl";
+    const populateFields = "_id username displayName avatarUrl";
 
     // lấy danh sách lời mời đã gửi / đã nhận
     const [sent, received] = await Promise.all([

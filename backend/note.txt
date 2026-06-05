@@ -1,4 +1,7 @@
 =================================================================================================
+backend Express deploy on Render
+
+=================================================================================================
 npm installs
 
     - express          --> Framework xây dựng api
@@ -9,9 +12,20 @@ npm installs
     - jsonwebtoken     --> Dùng cho chức năng đăng nhập / phân quyền người dùng
     - bcrypt           --> Mã hóa mật khẩu
     - cookie-parser    --> Đọc dữ liệu cookie từ request
+    - swagger-ui-express --> Tạo swagger document
+    - socket.io-client   --> Kết nối giữa FE và BE
+    - cloudinary         --> Lưu trữ hình ảnh avatar của người dùng
+    - multer             --> Đọc file gửi lên từ request
 
 =================================================================================================
-Flow của Authentications:
+Cloudinary: nền tảng lưu trữ đám mây cho hình ảnh / video
+    - Cloud name
+    - API key
+    - API secret
+    - API environment variable (hiện tại chưa thấy sử dụng cái này)
+
+=================================================================================================
+Flow của Authentications:`
 
 Sign up: 
     - Lấy signup data từ request
@@ -68,3 +82,14 @@ Socket IO
         * viết hàm emit sự kiện online/offline
     + messageController:
         * viết hàm emit sự kiện new message (controller & helper)
+
+=================================================================================================
+Flow theo dõi trạng thái tin nhắn để biết khi nào tin nhắn được đọc
+- Khi user mở một conversation:
+    + backend: gọi API markAsSeen
+        * cập nhật dữ liệu: thêm user vào danh sách seenBy trong conversation
+        * reset unreadCounts[user] = 0 (người này không có tin nào chưa đọc)
+        * phát socket event rằng "user này đã đọc tin nhắn rồi"
+    + frontend: sau khi backend api trả về:
+        * cập nhật conversation trong store để UI thay đổi trạng thái
+    + khi có tin nhắn mới: nếu tin nhắn thuộc đúng cuộc hội thoại user đang mở --> gọi markAsSeen ngay

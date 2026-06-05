@@ -62,19 +62,19 @@ const MessageInput = ({ selectedConver }: { selectedConver: Conversation }) => {
         />
 
         <div className="absolute right-2 top-1/2 transform -translate-y-1/2 flex items-center gap-1">
-          <Button
+          <div
             // asChild
-            variant="ghost"
-            size="icon"
+            // variant="ghost"
+            // size="icon"
             className="size-8 hover:bg-primary/10 transition-smooth"
           >
-            <div>
+            <div className="flex items-center justify-center h-full">
               {/* emoji picker */}
               <EmojiPicker
                 onChange={(emoji: string) => setValue(`${value}${emoji}`)}
               />
             </div>
-          </Button>
+          </div>
         </div>
       </div>
 

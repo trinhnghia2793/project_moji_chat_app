@@ -1,6 +1,6 @@
 import type { Socket } from "socket.io-client";
 import type { Conversation, Message } from "./chat";
-import type { User } from "./user";
+import type { Friend, FriendRequest, User } from "./user";
 
 export interface AuthState {
   accessToken: string | null;
@@ -8,6 +8,7 @@ export interface AuthState {
   loading: boolean;
 
   setAccessToken: (accesstoken: string) => void;
+  setUser: (user: User) => void;
   clearState: () => void;
 
   signUp: (
@@ -35,7 +36,7 @@ export interface ThemeState {
   setTheme: (dark: boolean) => void;
 }
 
-export interface ChatState {
+export interface ChatState { // used in useChatStore.ts
   conversations: Conversation[];
   messages: Record<string, {
     items: Message[],
@@ -45,6 +46,7 @@ export interface ChatState {
   activeConversationId: string | null; // id của cuộc trò chuyện đang mở
   converLoading: boolean;
   messageLoading: boolean;
+  loading: boolean;
 
   reset: () => void;
   setActiveConversation: (id: string | null) => void; // để những component khác cập nhật giá trị của active conversation
@@ -61,7 +63,10 @@ export interface ChatState {
     imgUrl?: string,
   ) => Promise<void>;
   addMessage: (message: Message) => Promise<void>; // add message
-  updateConversation: (conversation: Conversation) => void; // update conversation properties
+  updateConversation: (conversation: unknown) => void; // update conversation properties
+  markAsSeen: () => Promise<void>;
+  addConver: (conver: Conversation) => void; // thêm conversation vào danh sách conversations trong store
+  createConversation: (type: "group" | "direct", name: string, memberIds: string[]) => Promise<void>; // tạo cuộc trò chuyện: gọi API từ chatService ở backend --> cập nhật store
 }
 
 export interface SocketState {
@@ -69,4 +74,21 @@ export interface SocketState {
   onlineUsers: string[];
   connectSocket: () => void;
   disconnectSocket: () => void;
+}
+
+export interface FriendState {
+  friends: Friend[];
+  loading: boolean; // khi nào api chạy xong
+  receivedList: FriendRequest[];
+  sentList: FriendRequest[];
+  searchByUsername: (username: string) => Promise<User | null>;
+  addFriend: (to: string, message?: string) => Promise<string>;
+  getAllFriendRequests: () => Promise<void>;
+  acceptRequest: (requestId: string) => Promise<void>;
+  declineRequest: (requestId: string) => Promise<void>;
+  getFriends: () => Promise<void>;
+}
+
+export interface UserState {
+  updateAvatarUrl: (formData: FormData) => Promise<void>;
 }

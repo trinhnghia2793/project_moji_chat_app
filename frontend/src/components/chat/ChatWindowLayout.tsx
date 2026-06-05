@@ -1,10 +1,11 @@
 import { useChatStore } from "@/stores/useChatStore";
 import ChatWelcomeScreen from "./ChatWelcomeScreen";
-import ChatWindowSkeleton from "./ChatWindowSkeleton";
 import { SidebarInset } from "../ui/sidebar";
 import ChatWindowHeader from "./ChatWindowHeader";
 import ChatWindowBody from "./ChatWindowBody";
 import MessageInput from "./MessageInput";
+import { useEffect } from "react";
+import ChatWindowSkeleton from "../skeleton/ChatWindowSkeleton";
 
 const ChatWindowLayout = () => {
   const {
@@ -12,10 +13,27 @@ const ChatWindowLayout = () => {
     conversations,
     messageLoading: loading,
     // messages,
+    markAsSeen,
   } = useChatStore();
 
   const selectedConver =
     conversations.find((c) => c._id === activeConversationId) ?? null;
+
+  useEffect(() => {
+    if(!selectedConver) {
+      return;
+    }
+
+    const markSeen = async () => {
+      try {
+        await markAsSeen();
+      } catch (error) {
+        console.log("Lỗi khi markSeen", error);
+      }
+    }
+    
+    markSeen();
+  }, [markAsSeen, selectedConver]);
 
   if (!selectedConver) {
     return <ChatWelcomeScreen />;
