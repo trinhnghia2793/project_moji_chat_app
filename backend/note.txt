@@ -93,3 +93,9 @@ Flow theo dõi trạng thái tin nhắn để biết khi nào tin nhắn đượ
     + frontend: sau khi backend api trả về:
         * cập nhật conversation trong store để UI thay đổi trạng thái
     + khi có tin nhắn mới: nếu tin nhắn thuộc đúng cuộc hội thoại user đang mở --> gọi markAsSeen ngay
+
+
+# Moji chat app
+
+## 1. Build Sign up / Sign in / Sign out system
+## 2. Build backend structure & logics (routes, middlewares, controllers, models, ...) + Swagger
